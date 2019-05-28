@@ -1,0 +1,356 @@
+import pygame
+import time
+
+pygame.init()
+
+white = (255, 255, 255)
+black = (0, 0, 0)
+red = (255, 0, 0)
+green = (0, 155, 0)
+pellet_color = (250, 171, 68)
+transparent = (0,0,0)
+
+display_width = 1280
+display_height = 720
+
+gameDisplay = pygame.display.set_mode((display_width, display_height)) # for example,800 pixels wide and 600 pixels tall
+pygame.display.set_caption('PacMan')
+
+background = pygame.image.load('lahg.jpg') # import image into 'final' folder to call it into pycharm
+
+icon = pygame.image.load('pac.png')
+
+pellet = pygame.image.load('pellet.png')
+
+orig_pac = pygame.transform.scale(icon, (30, 30))
+
+tru_pellet = pygame.transform.scale(pellet, (20, 20))
+
+
+###
+# surface = pygame.image.load('pellet.png')
+
+
+pac = orig_pac
+angle = 0
+pygame.display.update() # updates a specific area mentioned; without parameters --> update entire surface
+border = False
+gameExit = False
+gameEnd = False
+
+lead_x = display_width/2
+lead_y = display_height/2
+
+velX = 0
+velY = 0
+
+lead_x_change = 0
+lead_y_change = 0
+
+clock = pygame.time.Clock()
+
+block_size = 7
+FPS = 30
+
+pygame.font.init()
+show_text = False
+pause = False
+start = True
+
+
+seeing = True
+
+
+
+font = pygame.font.Font(None, 50) # changed from SysFont to Font. probably a mac thing.
+
+# if (start):
+
+def message_to_screen(msg, color, coordinates):
+    screen_text = font.render(msg, True, color)
+    gameDisplay.blit(screen_text,coordinates)
+    pygame.display.update()
+
+
+while not gameExit:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            gameExit = True
+        print(event)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                lead_x_change = -block_size
+                lead_y_change = 0
+                pac = pygame.transform.flip(orig_pac, True, False)
+                velX = -10
+            elif event.key == pygame.K_RIGHT:
+                lead_x_change = block_size
+                lead_y_change = 0
+                pac = pygame.transform.rotate(orig_pac, angle)
+                velX = 10
+            elif event.key == pygame.K_UP:
+                lead_y_change = -block_size
+                lead_x_change = 0
+                pac = pygame.transform.rotate(orig_pac, angle + 90)
+                velY = -10
+            elif event.key == pygame.K_DOWN:
+                lead_y_change = block_size
+                lead_x_change = 0
+                pac = pygame.transform.rotate(orig_pac, angle - 90)
+                velY = 10
+            elif event.key == pygame.K_f:
+                print("f pressed")
+                show_text = True
+            elif event.key == pygame.K_ESCAPE:
+                pause = True
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_f:
+                show_text = False
+
+    gameDisplay.blit(background, (0,0))
+
+    #for rows:
+        #for columns:
+            #if says 1, draw rect
+            #pygame.draw.rect [[0011],
+                                #[0011]
+                     # if space to right is one, dont allow pacman to move
+
+    # if lead_x_change > 0:
+    #     for i in range(int(lead_x + int(block_size) + 1)):
+    #         for j in range(int(lead_y) + int(block_size)):
+    #             nextX = lead_x + i
+    #             nextY = lead_y + j
+    #             if int(nextX) >= 0 and int(nextX) < display_width and int(nextY) >= 0 and int(lead_y + ) < display_height and gameDisplay.get_at((int(nextX), int(nextY)))[2] > 200:
+    #                 lead_x_change = 0
+    #                 lead_y_change = 0
+    #                 break
+            # for i in range(lead_y_change):
+            #     nextX = int(lead_x)
+            #     nextY = int(lead_y + i)
+
+    # lead_x += lead_x_change
+
+    if lead_y_change > 0:
+        for i in range(25):
+            if lead_y < display_height and lead_y > 0 and gameDisplay.get_at((int(lead_x + 15), int(lead_y + 35)))[2] > 30:
+                lead_y_change = 0
+                lead_y = lead_y
+                break
+
+    if lead_y_change < 0:
+        for i in range(10):
+            if lead_y < display_height and lead_y > 0 and gameDisplay.get_at((int(lead_x + 15), int(lead_y - i)))[2] > 30:
+                lead_y_change = 0
+                lead_y = lead_y
+                break
+    lead_y += lead_y_change
+
+    if 697 < lead_x < 818 and 325 < lead_y < 363:
+        lead_x = lead_x
+
+    elif lead_x_change > 0:
+        for i in range(30):
+            if lead_x < display_width and lead_x > 0 and gameDisplay.get_at((int(lead_x + 35), int(lead_y + 15)))[2] > 50:
+                lead_x_change = 0
+                lead_x = lead_x
+                break
+    elif lead_x_change < 0:
+        for i in range(10):
+            if lead_x < display_width and lead_x > 0 and gameDisplay.get_at((int(lead_x - 4), int(lead_y + 15)))[2] > 50:
+                lead_x_change = 0
+                lead_x = lead_x
+                break
+    lead_x += lead_x_change
+
+    # if lead_y_change < 0:
+    #     for i in range(block_size):
+    #         if gameDisplay.get_at((int(lead_x - 10), int(lead_y - 10)))[2] > 60:
+    #             lead_y_change = 0
+    #             lead_x = lead_x
+    #             lead_y = lead_y + 10
+    #             break
+    # lead_y += lead_y_change
+    # lead_y += lead_y_change
+
+
+    if lead_y > display_height- 36:
+        lead_y = display_height + 100
+        lead_y = 11
+
+    if lead_y < 10:
+        lead_y = display_height - 100
+        lead_y = display_height -36
+
+    if lead_x > 1200:  # or lead_x < 0 or lead_y < 0 or lead_y > display_height:
+        lead_x = 1200
+    if lead_x < 28:
+        lead_x = 28
+    # if lead_x < 25 and lead_y < 30:
+    #     lead_x = 25
+    if lead_y < 25 and lead_x < 465:
+        lead_y = 29
+    if 410 < lead_x < 500 and lead_y < 120:
+        lead_x = 410
+    # if lead_y
+
+    if lead_y > 660 and lead_x < 468:
+        lead_y = 660
+    if lead_y > 660 and lead_x > 882:
+        lead_y = 660
+
+    if 864 < lead_x < 911 and lead_y > 565:
+        lead_x = 911
+
+    if 440 < lead_x < 630 and lead_y < 145:
+        lead_y = 145
+
+    if 440 < lead_x < 630 and lead_y > 535:
+        lead_y = 535
+
+    if 420 < lead_x < 630 and lead_y > 580:
+        lead_x = 420
+
+    if 595 < lead_x < 646 and lead_y < 140:
+        lead_x = 646
+
+    if 595 < lead_x < 646 and lead_y > 581:
+        lead_x = 646
+
+    if 670 < lead_x < 717 and lead_y < 140:
+        lead_x = 670
+
+    if 670 < lead_x < 710 and lead_y > 571:
+        lead_x = 670
+
+    if lead_y < 25 and 850 < lead_x < display_width:
+        lead_y = 29
+
+    if lead_y > 581 and 680 < lead_x < 888:
+        lead_y = 150
+
+    if lead_y > 535 and 680 < lead_x < 888:
+        lead_y = 535
+
+    if 880 < lead_x < 900 and lead_y < 140:
+        lead_x = 900
+
+    if lead_y < 145 and 710 < lead_x < 889:
+        lead_y = 145
+
+    if 180 < lead_x < 232 and lead_y < 60:
+        lead_x = 180
+
+    if 180 < lead_x < 250 and lead_y < 69:
+        lead_y = 69
+
+    if 232 < lead_x < 272 and lead_y < 60:
+        lead_x = 272
+
+      ## bottom nub
+
+
+    if(show_text):
+        #message_to_screen("OH LOOK THERE'S TEXT", red, (lead_x, lead_y))
+        gameDisplay.blit(background, (lead_x, lead_y))
+
+    # pygame.draw.rect(gameDisplay, black, (display_width/2, display_height/2), [lead_x, lead_y, block_size, block_size]) # [X, Y, width, height]
+
+    # pac = gameDisplay.blit(icon, (lead_x, lead_y))
+    gameDisplay.blit(pac, (lead_x, lead_y))
+    #gameDisplay.blit(icon, (0, 0))
+    # gameDisplay.fill(red, [200, 200, 50, 50])
+
+
+    if(seeing):
+        while seeing:
+            gameDisplay.blit(tru_pellet, (801, 354))
+
+
+    ###
+    # gameDisplay.blit(tru_pellet, (801, 354))
+    ###
+
+
+
+    # tru_pellet0 = pygame.Surface.set_alpha(0, flags = 0)
+
+
+
+    pygame.display.update() # adds onto the background in certain areas, such as adding additional pixels on the screen
+
+    clock.tick(FPS)
+
+    # if no peach on entire field --> game end
+
+    # for i in 1280:
+    #     for j in 720:
+    #         if gameDisplay.get_at(i, j)[1] != 255:
+    #             gameEnd = True
+
+    if(pause):
+        while pause:
+            gameDisplay.fill(black)
+            message_to_screen("Paused", red, (display_width / 3, display_height / 3))
+            message_to_screen("Press C to continue or Q to quit", red, (display_width/4, display_height/2))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.QUIT()
+                    quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_c:
+                        pause = False
+                    elif event.key == pygame.K_q:
+                        pygame.QUIT()
+                        quit()
+
+    if (gameEnd):
+        while gameEnd:
+            gameDisplay.fill(black)
+            message_to_screen("Victory", pellet_color, (display_width / 3, display_height / 3))
+            message_to_screen("Q to quit", red, (display_width / 4, display_height / 2))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.QUIT()
+                    quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        pygame.QUIT()
+                        quit()
+
+    # class Block(pygame.sprite.Sprite):
+    #     def __init__(self, color, width, height):
+    #         super().__init__()
+    #         self.image = pygame.Surface([20, 20])
+    #         self.image.fill(pellet_color)
+    #
+    #         pygame.draw.rect(self.image, pellet_color, [840, 350, 20, 20])
+    #
+    #         self.rect = self.image.get_rect()
+    #         self.hitbox = (self.x + )
+    # def update(self):
+
+    # class PacMan
+    #
+    # class Pellet(pygame.sprite.Sprite):
+    #     def __init__(self):
+    #         pygame.sprite.Sprite.__init__(self)
+    #         self.image = pygame.Surface([20, 20])
+    #         self.image.fill(pellet_color)
+    #         self.rect = self.image.get_rect()
+    #         pygame.draw.rect(self.image, pellet_color, [840, 350, 20, 20])
+    #
+    #     def update(self):
+    #         if Pellet.is_collided_with_(PacMan)
+    #             self.kill()
+
+
+
+#gameDisplay.fill(white)
+# message_to_screen("You Lose", red, (display_width/2, display_height/2))
+# time.sleep(2)
+print ("Hi")
+pygame.quit()
+quit()
+
